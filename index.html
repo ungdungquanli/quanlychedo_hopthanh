@@ -9,7 +9,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <script>
-    const HT_DUONG_DAN_API = "https://script.google.com/macros/s/AKfycbzOVyDWdKsn0mG0ba38cpimEaQjkLNG-XlK_pOZ_pvW5gmw1-O9IlErQrJVvSn2bZLi/exec";
+    const HT_DUONG_DAN_API = "https://script.google.com/macros/s/AKfycbzuvwPLKjGmcxqtwsur2h9GLJMsG0vayOcnTxgeiaZT0shYWhaj6dO__WGmGKV93HE3/exec";
 
     window.google = window.google || {};
     window.google.script = {
@@ -95,8 +95,8 @@
     .msg-title { font-size: 18px; font-weight: bold; margin: 0 0 10px 0; color: #333; }
     .msg-desc { color: #4b5563; font-size: 15px; line-height: 1.5; margin-bottom: 20px; }
     
-    #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0fdf4; z-index: 1060; display: flex; flex-direction: column; justify-content: center; align-items: center; font-family: "Times New Roman", serif; }
-    .login-box { background: rgba(255, 255, 255, 0.95); padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; border-top: 5px solid #0d6efd; width: 90%; max-width: 450px; box-sizing: border-box; }
+    #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0fdf4; z-index: 1060; display: flex; flex-direction: column; justify-content: center; align-items: center; font-family: "Times New Roman", serif; overflow-y: auto; }
+    .login-box { background: rgba(255, 255, 255, 0.95); padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; border-top: 5px solid #0d6efd; width: 90%; max-width: 480px; box-sizing: border-box; margin: 20px auto; }
     .login-logo { width: 80px; height: 80px; margin-bottom: 15px; }
     #pageLoading { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px); z-index: 1065;}
     .spinner-ring { width: 60px; height: 60px; border: 5px solid rgba(0, 0, 0, 0.1); border-left-color: #0d6efd; border-top-color: #dc3545; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
@@ -144,12 +144,20 @@
     <h4 style="color: #dc3545; margin-bottom: 25px; font-size: 20px;">Trường TH&THCS Hợp Thành</h4>
     <p style="font-size: 14px; color: #666; font-style: italic; margin-bottom: 20px;">Hệ thống yêu cầu xác thực bằng Tài khoản đã được cấp quyền</p>
      <p1 style="font-size: 13px; color:#dc3545;font-weight: bold;; margin-bottom: 20px;">Phiên bản: V2.3.2026</p1>
+    
     <div id="g_id_onload" data-client_id="407480994586-m6fpq6sfcc90qqj9k08rsmi1lge6br94.apps.googleusercontent.com" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
     <div style="display: flex; justify-content: center; width: 100%; margin-top: 10px;">
        <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left"></div>
     </div>
     
-    <div style="width: 100%; text-align: center; margin-top: 30px; font-size: 12px; color: #999; font-weight: bold;">Thiết kế và phát triển: HOÀNG NGỌC LÂM</div>
+    <div style="margin-top: 25px; font-size: 13.5px; color: #15803d; background: #f0fdf4; padding: 15px; border-radius: 8px; border: 1px dashed #bbf7d0; text-align: justify; line-height: 1.5; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+        <div style="text-align: center; margin-bottom: 8px; font-weight: bold; font-size: 15px;">
+            <span style="font-size: 18px; margin-right: 5px;">🛡️</span><span style="text-transform: uppercase;">Cam kết an toàn bảo mật</span>
+        </div>
+        Hệ thống tuân thủ nghiêm ngặt các quy định an toàn thông tin nội bộ. Việc đăng nhập chỉ dùng để <b>xác thực quyền truy cập</b> của Cán bộ. Ứng dụng cam kết <b>không</b> lưu trữ mật khẩu, <b>không</b> theo dõi và <b>không</b> chia sẻ bất kỳ dữ liệu cá nhân nào ra bên ngoài.
+    </div>
+    
+    <div style="width: 100%; text-align: center; margin-top: 25px; font-size: 12px; color: #999; font-weight: bold;">Thiết kế và phát triển: HOÀNG NGỌC LÂM</div>
   </div>
 </div>
 
