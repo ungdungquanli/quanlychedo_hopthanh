@@ -7,6 +7,7 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
   <script src="ketnoi.js"></script>
 
@@ -72,7 +73,6 @@
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
     
-    /* GIAO DIỆN BÁO LỖI QUYỀN TRUY CẬP */
     #accessDenied { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; font-family: "Times New Roman", serif; }
     .denied-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); text-align: center; max-width: 600px; width: 90%; }
     .denied-icon { font-size: 4rem; color: #dc3545; margin-bottom: 20px; }
@@ -107,7 +107,7 @@
     <h2 style="color: #0d6efd; margin-top: 0; text-transform: uppercase; font-size: 24px;">Quản Lý Dữ Liệu chế độ</h2>
     <h3 style="color: #dc3545; margin-bottom: 25px; font-size: 20px;">Lương & Thâm Niên</h3>
     <h4 style="color: #dc3545; margin-bottom: 25px; font-size: 20px;">Trường TH&THCS Hợp Thành</h4>
-    <p style="font-size: 14px; color: #666; font-style: italic; margin-bottom: 20px;">Hệ thống yêu cầu xác thực bằng Tài khoản đã được cấp quyền</p>
+    <p style="font-size: 14px; color: #666; font-style: italic; margin-bottom: 20px;">Hệ thống yêu cầu xác thực bằng Email đã được cấp quyền</p>
     <p style="font-size: 13px; color:#dc3545; font-weight: bold; margin-bottom: 20px;">Phiên bản: V2.3.2026</p>
     <div id="g_id_onload" data-client_id="376040819369-4snobajf9rcspsq8gqts78sq894kp2l5.apps.googleusercontent.com" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
     <div style="display: flex; justify-content: center; width: 100%; margin-top: 10px;">
@@ -228,61 +228,10 @@
   });
 
   function checkTrialPeriod() {
-       return true; 
-
-    const trialStartDate = new Date(2026, 1, 7); 
-    const trialDays = 14;
-    const trialExpiryDate = new Date(trialStartDate);
-    trialExpiryDate.setDate(trialStartDate.getDate() + trialDays);
-    const today = new Date();
-
-    const trialModalElement = document.getElementById('trialModal');
-    const btnTrialOk = document.getElementById('btnTrialOk');
-    const trialMessage = document.getElementById('trialMessage');
-    const trialTitle = document.getElementById('trialTitle');
-
-    if (!trialModalElement || !btnTrialOk) return true;
-
-    if (today > trialExpiryDate) {
-      trialTitle.innerText = "Hết hạn dùng thử";
-      trialTitle.style.color = "#dc2626";
-      trialMessage.innerHTML = "Thời gian dùng thử 14 ngày của bạn đã kết thúc.<br>Vui lòng liên hệ Admin để gia hạn phần mềm.";
-      
-      btnTrialOk.innerText = 'Thoát hệ thống';
-      btnTrialOk.className = 'btn btn-danger fw-bold';
-      btnTrialOk.removeAttribute('data-bs-dismiss'); 
-      
-      btnTrialOk.onclick = function() {
-        document.body.innerHTML = '<div style="display:flex; height:100vh; align-items:center; justify-content:center; background:#f8fafc; color:#dc2626; font-family:\'Times New Roman\',serif; font-size:24px; font-weight:bold; text-transform:uppercase;">Hệ thống đã khóa do hết hạn dùng thử</div>';
-      };
-      
-      const trialModal = new bootstrap.Modal(trialModalElement, { backdrop: 'static', keyboard: false });
-      trialModal.show();
-      
-      if(document.getElementById('mainApp')) document.getElementById('mainApp').style.display = 'none';
-      return false;
-    }
-
-    if (!sessionStorage.getItem("CD_TRIAL_SHOWN")) {
-      trialTitle.innerText = "Thông báo dùng thử";
-      trialTitle.style.color = "#1e3a8a";
-      trialMessage.innerHTML = "Bạn đang trong thời gian dùng thử 14 ngày.<br>Ngày bắt đầu: 07/02/2026.";
-      
-      btnTrialOk.innerText = 'Đồng ý';
-      btnTrialOk.className = 'btn btn-primary fw-bold';
-      btnTrialOk.setAttribute('data-bs-dismiss', 'modal');
-      btnTrialOk.onclick = function() {
-         sessionStorage.setItem("CD_TRIAL_SHOWN", "true");
-      };
-
-      const trialModal = new bootstrap.Modal(trialModalElement, { backdrop: 'static', keyboard: false });
-      trialModal.show();
-    }
-    return true;
+    return true; 
   }
 
   window.onload = function() {
-    // ĐÃ ĐỒNG BỘ: Sử dụng tên biến chuẩn CD_TAI_KHOAN
     const storedEmail = sessionStorage.getItem("CD_TAI_KHOAN");
     if(storedEmail) {
       window.CD_GLOBAL_EMAIL = storedEmail; 
@@ -292,7 +241,6 @@
     }
   };
 
-  /* --- CÁC HÀM XỬ LÝ CHÍNH KHÁC --- */
   function decodeJwtResponse(token) {
     let base64Url = token.split('.')[1]; let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     let jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join(''));
@@ -301,13 +249,11 @@
   
   function handleCredentialResponse(response) {
       const payload = decodeJwtResponse(response.credential);
-      // ĐÃ ĐỒNG BỘ: Sử dụng tên biến chuẩn CD_TAI_KHOAN
       sessionStorage.setItem("CD_TAI_KHOAN", payload.email); 
       location.reload();
   }
   
   function logoutGoogle() { 
-      // ĐÃ ĐỒNG BỘ: Sử dụng tên biến chuẩn CD_TAI_KHOAN
       sessionStorage.removeItem("CD_TAI_KHOAN"); 
       sessionStorage.removeItem("CD_TRIAL_SHOWN");
       location.reload(); 
@@ -357,7 +303,7 @@
       document.getElementById('btnTabSearch').classList.add('active'); document.getElementById('tab-search').classList.remove('hidden');
     } else {
       document.getElementById('btnTabUpdate').classList.add('active'); document.getElementById('tab-update').classList.remove('hidden');
-      renderInputTableStructure(); if(typeof loadFolders === 'function') loadFolders();
+      renderInputTableStructure(); if(typeof taiDanhSachThuMuc === 'function') taiDanhSachThuMuc();
     }
   }
 
@@ -415,7 +361,6 @@
     const boLoc = { text8: document.getElementById('s_hoten').value, text2: document.getElementById('s_thang').value, text3: document.getElementById('s_nam').value };
     const tbody = document.getElementById('s_tbody'); tbody.innerHTML = '<tr><td colspan="15">⏳ Đang tải...</td></tr>';
     
-    // ĐÃ ĐỒNG BỘ: Sử dụng tên hàm chuẩn CD_TraCuuLuong và CD_TraCuuThamNien
     window.google.script.run.withSuccessHandler(rows => {
       if(!rows || rows.length === 0) { tbody.innerHTML = '<tr><td colspan="15">Không có dữ liệu phù hợp.</td></tr>'; return; }
       let h = '';
@@ -459,7 +404,7 @@
         }
       });
       tbody.innerHTML = h;
-    }).withFailureHandler(err => { tbody.innerHTML=`<tr><td colspan="15" class="text-error">Lỗi: ${err.message}</td></tr>`; })
+    }).withFailureHandler(loi => { tbody.innerHTML=`<tr><td colspan="15" class="text-error">Lỗi: ${loi.message}</td></tr>`; })
     [loai === 'LUONG' ? 'CD_TraCuuLuong' : 'CD_TraCuuThamNien'](boLoc); 
   }
 
@@ -550,7 +495,6 @@
     
     status.className = 'status-msg text-loading'; status.innerText = `⏳ Đang lưu...`;
 
-    // ĐÃ ĐỒNG BỘ: Sử dụng tên hàm chuẩn CD_CapNhatMotDong và CD_CapNhatHangLoat
     if (editRowIndex) {
          window.google.script.run.withSuccessHandler(res => {
             status.className = 'status-msg text-success'; status.innerText = "✅ " + res;
@@ -623,7 +567,6 @@
       if(!url) { resetRowFileUI(rowCell); return; }
       
       btn.innerText = "⏳";
-      // ĐÃ ĐỒNG BỘ: Sử dụng tên hàm chuẩn CD_XoaMinhChung
       window.google.script.run.withSuccessHandler(res => {
           if(res.thanhCong) { resetRowFileUI(rowCell); showNotify("Đã xóa file vĩnh viễn trên Drive!", "success"); } 
           else { btn.innerText = "❌"; showNotify("Lỗi: " + res.thongBao, "error"); }
@@ -650,7 +593,6 @@
 
       document.getElementById('loading-msg').innerText = "Đang kiểm tra quyền truy cập...";
       
-      // ĐÃ ĐỒNG BỘ: Sử dụng tên hàm chuẩn CD_LayQuyenNguoiDung
       window.google.script.run.withSuccessHandler(ctx => {
         document.getElementById('pageLoading').style.display = 'none';
         if (!ctx.quyenXem && !ctx.quyenSua) { 
@@ -670,7 +612,6 @@
 
         checkTrialPeriod();
 
-        // ĐÃ ĐỒNG BỘ: Sử dụng tên hàm chuẩn CD_KiemTraQuyenDrive
         if (ctx.quyenSua) { window.google.script.run.withSuccessHandler(ok => { if(!ok) console.log("Drive Access Needed"); }).CD_KiemTraQuyenDrive(); }
       }).withFailureHandler(err => { 
           document.getElementById('pageLoading').style.display = 'none'; showNotify("Lỗi hệ thống: " + err.message, "error"); 
