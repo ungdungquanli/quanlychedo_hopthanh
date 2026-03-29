@@ -8,37 +8,7 @@
   
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzuvwPLKjGmcxqtwsur2h9GLJMsG0vayOcnTxgeiaZT0shYWhaj6dO__WGmGKV93HE3/exec";
-
-    window.google = window.google || {};
-    window.google.script = {
-      run: {
-        withSuccessHandler: function(handler) { this._successHandler = handler; return this; },
-        withFailureHandler: function(handler) { this._failureHandler = handler; return this; },
-        _callServer: function(funcName, args) {
-          const success = this._successHandler; const failure = this._failureHandler;
-          this._successHandler = null; this._failureHandler = null;
-          const userEmail = sessionStorage.getItem("CD_USER_EMAIL") || "";
-
-          fetch(SCRIPT_URL, {
-            method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({ functionName: funcName, args: args, email: userEmail })
-          })
-          .then(res => res.json())
-          .then(res => {
-            if (res.error) { if (failure) failure(new Error(res.error)); else console.error(res.error); } 
-            else { if (success) success(res.data); }
-          })
-          .catch(err => { if (failure) failure(err); else console.error(err); });
-        }
-      }
-    };
-
-    ['CD_getSubFolders', 'CD_uploadMultipleFilesToDrive', 'CD_uploadFolderEvidence', 'CD_deleteEvidence', 'CD_doBatchUpdate', 'CD_updateRecord', 'CD_searchLuong', 'CD_searchThamNien', 'CD_getUserContext', 'CD_hasDrivePermission'].forEach(func => {
-      window.google.script.run[func] = function(...args) { this._callServer(func, args); };
-    });
-  </script>
+  <script src="ketnoi.js"></script>
 
   <style>
     :root { --primary: #1e3a8a; --bg: #f9fafb; --white: #ffffff; --border: #d1d5db; --red: #dc2626; --green: #059669; --orange: #d97706; }
@@ -102,15 +72,12 @@
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
     
-    .no-perm-box { background: #fff; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); width: 500px; max-width: 95%; overflow: hidden; font-family: "Times New Roman", serif; text-align: center; position: relative; }
-    .np-header { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: white; padding: 30px 20px; }
-    .np-icon { font-size: 50px; margin-bottom: 10px; display: block; animation: float 3s ease-in-out infinite; }
-    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
-    .np-title { font-size: 22px; margin: 0; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
-    .np-body { padding: 30px 20px; }
-    .np-msg { font-size: 16px; color: #4b5563; margin-bottom: 25px; line-height: 1.6; }
-    .np-btn { display: inline-block; background: #1e3a8a; color: white; border: none; cursor: pointer; padding: 12px 30px; border-radius: 30px; font-weight: bold; transition: all 0.3s; box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3); font-family: "Times New Roman", serif; font-size: 15px; }
-    .np-btn:hover { transform: scale(1.05); background: #1e40af; box-shadow: 0 6px 20px rgba(30, 58, 138, 0.4); }
+    /* GIAO DIỆN BÁO LỖI QUYỀN TRUY CẬP */
+    #accessDenied { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; font-family: "Times New Roman", serif; }
+    .denied-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); text-align: center; max-width: 600px; width: 90%; }
+    .denied-icon { font-size: 4rem; color: #dc3545; margin-bottom: 20px; }
+    .denied-title { font-size: 1.6rem; font-weight: bold; color: #333; margin-bottom: 10px; text-transform: uppercase; }
+    .denied-email { font-size: 1.1rem; color: #0d6efd; font-weight: bold; background: #e7f1ff; padding: 5px 15px; border-radius: 20px; display: inline-block; margin: 10px 0; }
   </style>
 </head>
 <body>
@@ -140,7 +107,7 @@
     <h2 style="color: #0d6efd; margin-top: 0; text-transform: uppercase; font-size: 24px;">Quản Lý Dữ Liệu chế độ</h2>
     <h3 style="color: #dc3545; margin-bottom: 25px; font-size: 20px;">Lương & Thâm Niên</h3>
     <h4 style="color: #dc3545; margin-bottom: 25px; font-size: 20px;">Trường TH&THCS Hợp Thành</h4>
-    <p style="font-size: 14px; color: #666; font-style: italic; margin-bottom: 20px;">Hệ thống yêu cầu xác thực bằng Email đã được cấp quyền</p>
+    <p style="font-size: 14px; color: #666; font-style: italic; margin-bottom: 20px;">Hệ thống yêu cầu xác thực bằng Tài khoản đã được cấp quyền</p>
     <p style="font-size: 13px; color:#dc3545; font-weight: bold; margin-bottom: 20px;">Phiên bản: V2.3.2026</p>
     <div id="g_id_onload" data-client_id="376040819369-4snobajf9rcspsq8gqts78sq894kp2l5.apps.googleusercontent.com" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
     <div style="display: flex; justify-content: center; width: 100%; margin-top: 10px;">
@@ -158,13 +125,16 @@
   </div>
 </div>
 
-<div id="accessDenied" class="overlay-screen" style="display:none; background: #f3f4f6;">
-   <div class="no-perm-box">
-      <div class="np-header"><span class="np-icon">🔒</span><h2 class="np-title">Hạn chế Quyền Truy Cập</h2></div>
-      <div class="np-body">
-         <p class="np-msg">Xin chào!<br>Tài khoản của bạn hiện chưa được cấp quyền truy cập.<br><br>Vui lòng liên hệ Admin hoặc Đăng xuất thử tài khoản khác.</p>
-         <button class="np-btn" onclick="logoutGoogle()">🔄 Đăng xuất</button>
-      </div>
+<div id="accessDenied">
+   <div class="denied-card">
+       <img src="https://i.ibb.co/SXSKh9xM/Logo-m-i-c-a-tr-ng-H-p-Th-Nh.png" style="height: 80px; margin-bottom: 10px;">
+       <div class="denied-icon"><i class="bi bi-shield-lock-fill"></i></div>
+       <div class="denied-title">KẾT NỐI THÀNH CÔNG</div>
+       <p style="font-size: 1.1rem; color: #444;">Xin chào: <span id="deniedEmailTxt" class="denied-email"></span></p>
+       <p style="color:#666; font-size: 1rem; line-height: 1.5;">Tài khoản chưa được cấp quyền truy cập hệ thống.<br>Vui lòng liên hệ Admin để được hỗ trợ.</p>
+       <div class="d-flex justify-content-center gap-3 mt-4">
+          <button class="btn btn-outline-danger rounded-pill px-4 fw-bold" onclick="logoutGoogle()">🔄 Đổi tài khoản</button>
+       </div>
    </div>
 </div>
 
@@ -312,7 +282,8 @@
   }
 
   window.onload = function() {
-    const storedEmail = sessionStorage.getItem("CD_USER_EMAIL");
+    // ĐÃ ĐỒNG BỘ: Sử dụng tên biến chuẩn CD_TAI_KHOAN
+    const storedEmail = sessionStorage.getItem("CD_TAI_KHOAN");
     if(storedEmail) {
       window.CD_GLOBAL_EMAIL = storedEmail; 
       document.getElementById('login-overlay').style.display = 'none';
@@ -330,12 +301,14 @@
   
   function handleCredentialResponse(response) {
       const payload = decodeJwtResponse(response.credential);
-      sessionStorage.setItem("CD_USER_EMAIL", payload.email); 
+      // ĐÃ ĐỒNG BỘ: Sử dụng tên biến chuẩn CD_TAI_KHOAN
+      sessionStorage.setItem("CD_TAI_KHOAN", payload.email); 
       location.reload();
   }
   
   function logoutGoogle() { 
-      sessionStorage.removeItem("CD_USER_EMAIL"); 
+      // ĐÃ ĐỒNG BỘ: Sử dụng tên biến chuẩn CD_TAI_KHOAN
+      sessionStorage.removeItem("CD_TAI_KHOAN"); 
       sessionStorage.removeItem("CD_TRIAL_SHOWN");
       location.reload(); 
   }
@@ -442,6 +415,7 @@
     const boLoc = { text8: document.getElementById('s_hoten').value, text2: document.getElementById('s_thang').value, text3: document.getElementById('s_nam').value };
     const tbody = document.getElementById('s_tbody'); tbody.innerHTML = '<tr><td colspan="15">⏳ Đang tải...</td></tr>';
     
+    // ĐÃ ĐỒNG BỘ: Sử dụng tên hàm chuẩn CD_TraCuuLuong và CD_TraCuuThamNien
     window.google.script.run.withSuccessHandler(rows => {
       if(!rows || rows.length === 0) { tbody.innerHTML = '<tr><td colspan="15">Không có dữ liệu phù hợp.</td></tr>'; return; }
       let h = '';
@@ -486,7 +460,7 @@
       });
       tbody.innerHTML = h;
     }).withFailureHandler(err => { tbody.innerHTML=`<tr><td colspan="15" class="text-error">Lỗi: ${err.message}</td></tr>`; })
-    [loai === 'LUONG' ? 'CD_searchLuong' : 'CD_searchThamNien'](boLoc); 
+    [loai === 'LUONG' ? 'CD_TraCuuLuong' : 'CD_TraCuuThamNien'](boLoc); 
   }
 
   function transferToEdit(dataEncoded, loai) {
@@ -576,6 +550,7 @@
     
     status.className = 'status-msg text-loading'; status.innerText = `⏳ Đang lưu...`;
 
+    // ĐÃ ĐỒNG BỘ: Sử dụng tên hàm chuẩn CD_CapNhatMotDong và CD_CapNhatHangLoat
     if (editRowIndex) {
          window.google.script.run.withSuccessHandler(res => {
             status.className = 'status-msg text-success'; status.innerText = "✅ " + res;
@@ -585,14 +560,14 @@
             renderInputTableStructure(); 
          }).withFailureHandler(e => {
             status.className = 'status-msg text-error'; status.innerText = "❌ " + e.message; showNotify("❌ Lỗi: " + e.message, "error");
-         }).CD_updateRecord(type, editRowIndex, dataList[0]); 
+         }).CD_CapNhatMotDong(type, editRowIndex, dataList[0]); 
     } else {
          window.google.script.run.withSuccessHandler(res => {
             status.className = 'status-msg text-success'; status.innerText = "✅ " + res;
             showNotify("✅ " + res, "success"); renderInputTableStructure();
          }).withFailureHandler(e => {
             status.className = 'status-msg text-error'; status.innerText = "❌ " + e.message; showNotify("❌ Lỗi: " + e.message, "error");
-         }).CD_doBatchUpdate(dataList);
+         }).CD_CapNhatHangLoat(dataList);
     }
   }
 
@@ -648,10 +623,11 @@
       if(!url) { resetRowFileUI(rowCell); return; }
       
       btn.innerText = "⏳";
+      // ĐÃ ĐỒNG BỘ: Sử dụng tên hàm chuẩn CD_XoaMinhChung
       window.google.script.run.withSuccessHandler(res => {
-          if(res.success) { resetRowFileUI(rowCell); showNotify("Đã xóa file vĩnh viễn trên Drive!", "success"); } 
-          else { btn.innerText = "❌"; showNotify("Lỗi: " + res.message, "error"); }
-      }).CD_deleteEvidence(url);
+          if(res.thanhCong) { resetRowFileUI(rowCell); showNotify("Đã xóa file vĩnh viễn trên Drive!", "success"); } 
+          else { btn.innerText = "❌"; showNotify("Lỗi: " + res.thongBao, "error"); }
+      }).CD_XoaMinhChung(url);
   }
 
   function resetRowFileUI(rowCell) {
@@ -669,30 +645,36 @@
   }
 
   function checkPermissionAndLoad() {
-      const userEmail = sessionStorage.getItem("CD_USER_EMAIL");
+      const userEmail = sessionStorage.getItem("CD_TAI_KHOAN");
       if (!userEmail) return;
 
       document.getElementById('loading-msg').innerText = "Đang kiểm tra quyền truy cập...";
       
+      // ĐÃ ĐỒNG BỘ: Sử dụng tên hàm chuẩn CD_LayQuyenNguoiDung
       window.google.script.run.withSuccessHandler(ctx => {
         document.getElementById('pageLoading').style.display = 'none';
-        if (!ctx.canView && !ctx.canEdit) { document.getElementById('accessDenied').style.display = 'flex'; return; }
-        if (!ctx.canEdit) {
+        if (!ctx.quyenXem && !ctx.quyenSua) { 
+            document.getElementById('accessDenied').style.display = 'flex'; 
+            document.getElementById('deniedEmailTxt').innerText = ctx.taiKhoan;
+            return; 
+        }
+        if (!ctx.quyenSua) {
           const btnUp = document.getElementById('btnTabUpdate'); if(btnUp) btnUp.remove();
           const divUp = document.getElementById('tab-update'); if(divUp) divUp.remove();
         }
         
-        window.CD_CAN_EDIT = ctx.canEdit; 
+        window.CD_CAN_EDIT = ctx.quyenSua; 
         initSearchTable(); 
         
         document.getElementById('mainApp').style.opacity = '1';
 
         checkTrialPeriod();
 
-        if (ctx.canEdit) { window.google.script.run.withSuccessHandler(ok => { if(!ok) console.log("Drive Access Needed"); }).CD_hasDrivePermission(); }
+        // ĐÃ ĐỒNG BỘ: Sử dụng tên hàm chuẩn CD_KiemTraQuyenDrive
+        if (ctx.quyenSua) { window.google.script.run.withSuccessHandler(ok => { if(!ok) console.log("Drive Access Needed"); }).CD_KiemTraQuyenDrive(); }
       }).withFailureHandler(err => { 
           document.getElementById('pageLoading').style.display = 'none'; showNotify("Lỗi hệ thống: " + err.message, "error"); 
-      }).CD_getUserContext(userEmail);
+      }).CD_LayQuyenNguoiDung(userEmail);
   }
 </script>
 
