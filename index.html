@@ -348,8 +348,7 @@
   }
 
   // ====================================================================================
-  // KHỐI HÀM doSearch: Đã loại bỏ hoàn toàn sự can thiệp của bộ lọc phía Server 
-  // bằng cách truyền text2 và text3 là rỗng. Trình duyệt sẽ đảm nhận 100% việc lọc chính xác.
+  // KHỐI HÀM doSearch: Lọc dữ liệu trên trình duyệt. Đã điều chỉnh chỉ đối chiếu Ngày Nâng
   // ====================================================================================
   function doSearch() {
     const loai = document.getElementById('s_comboLoai').value;
@@ -366,7 +365,10 @@
     tbody.innerHTML = '<tr><td colspan="15">⏳ Đang tải...</td></tr>';
     
     window.google.script.run.withSuccessHandler(rows => {
-      if(!rows || rows.length === 0) { tbody.innerHTML = '<tr><td colspan="15">Không có dữ liệu phù hợp.</td></tr>'; return; }
+      if(!rows || rows.length === 0) { 
+          tbody.innerHTML = '<tr><td colspan="15">Không có dữ liệu phù hợp.</td></tr>'; 
+          return; 
+      }
 
       // BỘ LỌC THỨ CẤP: Ép kiểu Số nguyên (Number) để đối chiếu tuyệt đối (===)
       if (rawThang !== "" || rawNam !== "") {
@@ -374,40 +376,35 @@
           const searchY = rawNam !== "" ? parseInt(rawNam, 10) : null;
           
           rows = rows.filter(r => {
-              let m1, y1, m2, y2;
+              let m2, y2;
               if (loai === 'LUONG') {
-                  m1 = parseInt(r[6], 10); y1 = parseInt(r[7], 10);
-                  m2 = parseInt(r[12], 10); y2 = parseInt(r[13], 10);
+                  // Cột 12, 13 tương ứng với Tháng/Năm của Ngày Nâng (Lương)
+                  m2 = parseInt(r[12], 10); 
+                  y2 = parseInt(r[13], 10);
               } else {
-                  m1 = parseInt(r[4], 10); y1 = parseInt(r[5], 10);
-                  m2 = parseInt(r[9], 10); y2 = parseInt(r[10], 10);
+                  // Cột 9, 10 tương ứng với Tháng/Năm của Ngày Nâng (Thâm niên)
+                  m2 = parseInt(r[9], 10); 
+                  y2 = parseInt(r[10], 10);
               }
               
-              let match1 = true;
-              let match2 = true;
+              let match = true;
               
-              // Kiểm tra đối chiếu với Mốc 1 (Ngày Hưởng)
+              // Chỉ kiểm tra đối chiếu với Ngày Nâng
               if (searchM !== null) {
-                  if (isNaN(m1) || m1 !== searchM) match1 = false;
+                  if (isNaN(m2) || m2 !== searchM) match = false;
               }
               if (searchY !== null) {
-                  if (isNaN(y1) || y1 !== searchY) match1 = false;
+                  if (isNaN(y2) || y2 !== searchY) match = false;
               }
               
-              // Kiểm tra đối chiếu với Mốc 2 (Ngày Nâng)
-              if (searchM !== null) {
-                  if (isNaN(m2) || m2 !== searchM) match2 = false;
-              }
-              if (searchY !== null) {
-                  if (isNaN(y2) || y2 !== searchY) match2 = false;
-              }
-              
-              // Giữ lại dòng dữ liệu nếu nó khớp trọn vẹn với Mốc 1 HOẶC Mốc 2
-              return match1 || match2;
+              return match;
           });
       }
 
-      if(!rows || rows.length === 0) { tbody.innerHTML = '<tr><td colspan="15">Không có dữ liệu phù hợp.</td></tr>'; return; }
+      if(!rows || rows.length === 0) { 
+          tbody.innerHTML = '<tr><td colspan="15">Không có dữ liệu phù hợp.</td></tr>'; 
+          return; 
+      }
 
       let h = '';
       rows.forEach((r, i) => {
@@ -424,14 +421,18 @@
                     links.map((l, idx) => `<a href="${l.trim()}" target="_blank" style="text-decoration:none; background:#e0f2fe; border:1px solid #bae6fd; padding:2px 5px; border-radius:3px; font-size:12px; font-weight:bold; color:#0369a1;" title="Xem QĐ ${idx+1}">QĐ${idx+1}</a>`).join('') + `</div>`;
             } else if (linkStr) {
                 linkDisplay = `<a href="${linkStr}" target="_blank" style="text-decoration:none; background:#e0f2fe; border:1px solid #bae6fd; padding:2px 5px; border-radius:3px; font-size:12px; font-weight:bold; color:#0369a1;" title="${qdText}">QĐ 1</a>`;
-            } else { linkDisplay = qdText; }
+            } else { 
+                linkDisplay = qdText; 
+            }
         } else { 
             let str = String(qdObj || "").trim(); 
             if(str.includes('http')) {
                  let links = str.split(',').filter(l => l.includes('http'));
                  linkDisplay = `<div style="display:flex; flex-wrap:wrap; gap:3px; justify-content:center;">` + 
                     links.map((l, idx) => `<a href="${l.trim()}" target="_blank" style="text-decoration:none; background:#e0f2fe; border:1px solid #bae6fd; padding:2px 5px; border-radius:3px; font-size:12px; font-weight:bold; color:#0369a1;" title="Xem QĐ ${idx+1}">QĐ${idx+1}</a>`).join('') + `</div>`;
-            } else { linkDisplay = str; }
+            } else { 
+                linkDisplay = str; 
+            }
         }
 
         let htmlSua = "";
@@ -450,7 +451,9 @@
         }
       });
       tbody.innerHTML = h;
-    }).withFailureHandler(loi => { tbody.innerHTML=`<tr><td colspan="15" class="text-error">Lỗi: ${loi.message}</td></tr>`; })
+    }).withFailureHandler(loi => { 
+        tbody.innerHTML=`<tr><td colspan="15" class="text-error">Lỗi: ${loi.message}</td></tr>`; 
+    })
     [loai === 'LUONG' ? 'CD_TraCuuLuong' : 'CD_TraCuuThamNien'](boLoc); 
   }
 
