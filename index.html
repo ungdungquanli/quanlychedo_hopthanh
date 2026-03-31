@@ -174,10 +174,8 @@
     <div class="control-box">
       <select id="s_comboLoai" class="form-input" onchange="initSearchTable()"><option value="LUONG">Lương</option><option value="THAMNIEN">Thâm niên</option></select>
       <input type="text" id="s_hoten" class="form-input" placeholder="Tên cán bộ..." autocomplete="off" spellcheck="false" style="width: 160px;" />
-      
       <input type="text" id="s_thang" class="form-input" placeholder="Tháng (1-12)" autocomplete="off" spellcheck="false" style="width: 80px;" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value > 12) this.value = 12;" maxlength="2" />
-      <input type="text" id="s_nam" class="form-input" placeholder="Năm (2024)" autocomplete="off" spellcheck="false" style="width: 80px;" oninput="this.value = this.value.replace(/[^0-9]/g, '');" maxlength="4" />
-      
+      <input type="text" id="s_nam" class="form-input" placeholder="Năm (VD: 2024)" autocomplete="off" spellcheck="false" style="width: 100px;" oninput="this.value = this.value.replace(/[^0-9]/g, '');" maxlength="4" />
       <button class="btn btn-primary" onclick="doSearch()">🔍 Tra cứu</button>
     </div>
     <div class="table-responsive"><table><thead id="s_thead"></thead><tbody id="s_tbody"></tbody></table></div>
@@ -349,15 +347,16 @@
     thead.innerHTML = h; document.getElementById('s_tbody').innerHTML = '<tr><td colspan="15" style="color:#666; padding:15px;">...</td></tr>';
   }
 
-  // KHỐI SỬA LỖI TRA CỨU: Chuẩn hóa dữ liệu đầu vào, chống timeout do lọc tràn lan
+  // ====================================================================================
+  // KHỐI HÀM doSearch ĐÃ ĐƯỢC NÂNG CẤP BỘ LỌC CHÍNH XÁC KÉP TRÊN TRÌNH DUYỆT (FRONT-END)
+  // ====================================================================================
   function doSearch() {
     const loai = document.getElementById('s_comboLoai').value;
     const rawHoTen = document.getElementById('s_hoten').value.trim();
     let rawThang = document.getElementById('s_thang').value.trim();
     const rawNam = document.getElementById('s_nam').value.trim();
 
-    // Chuẩn hóa Tháng: Nếu nhập số có 1 chữ số (1 đến 9), tự động thêm số "0" phía trước.
-    // Điều này giúp máy chủ quét khớp chính xác định dạng ngày tháng (VD: "/01/"), tránh quét nhầm "1" thành "10", "11", "12".
+    // Định dạng đồng nhất trước khi gửi về máy chủ
     if (rawThang.length === 1 && rawThang >= '1' && rawThang <= '9') {
         rawThang = '0' + rawThang;
     }
@@ -369,6 +368,40 @@
     
     window.google.script.run.withSuccessHandler(rows => {
       if(!rows || rows.length === 0) { tbody.innerHTML = '<tr><td colspan="15">Không có dữ liệu phù hợp.</td></tr>'; return; }
+
+      // BỘ LỌC THỨ CẤP: Chặn đứng sai sót từ server, so sánh toán học chính xác 100%
+      if (rawThang !== "" || rawNam !== "") {
+          const searchM = rawThang !== "" ? parseInt(rawThang, 10) : null;
+          const searchY = rawNam !== "" ? parseInt(rawNam, 10) : null;
+          
+          rows = rows.filter(r => {
+              let m1, y1, m2, y2;
+              if (loai === 'LUONG') {
+                  m1 = parseInt(r[6], 10); y1 = parseInt(r[7], 10); // Ngày hưởng (tháng/năm)
+                  m2 = parseInt(r[12], 10); y2 = parseInt(r[13], 10); // Ngày nâng (tháng/năm)
+              } else {
+                  m1 = parseInt(r[4], 10); y1 = parseInt(r[5], 10);
+                  m2 = parseInt(r[9], 10); y2 = parseInt(r[10], 10);
+              }
+              
+              let match1 = true;
+              let match2 = true;
+              
+              // So khớp tuyệt đối với mốc thời gian 1 (Ngày Hưởng)
+              if (searchM !== null && m1 !== searchM) match1 = false;
+              if (searchY !== null && y1 !== searchY) match1 = false;
+              
+              // So khớp tuyệt đối với mốc thời gian 2 (Ngày Nâng)
+              if (searchM !== null && m2 !== searchM) match2 = false;
+              if (searchY !== null && y2 !== searchY) match2 = false;
+              
+              // Trả về hợp lệ nếu khớp chính xác với Mốc 1 HOẶC Mốc 2
+              return match1 || match2;
+          });
+      }
+
+      if(!rows || rows.length === 0) { tbody.innerHTML = '<tr><td colspan="15">Không có dữ liệu phù hợp.</td></tr>'; return; }
+
       let h = '';
       rows.forEach((r, i) => {
         const qdObj = loai === 'LUONG' ? r[14] : r[11]; 
@@ -609,7 +642,6 @@
             document.getElementById('pageLoading').style.display = 'flex';
             document.getElementById('loading-msg').innerText = "Đang kiểm tra phân quyền...";
             
-            // KHẮC PHỤC LỖI TẠI ĐÂY: Kiểm tra xem tệp ketnoi.js đã nạp thư viện đúng chưa
             if(!window.google || !window.google.script || !window.google.script.run) {
                 throw new Error("Lỗi nạp thư viện kết nối API. Xin vui lòng Tải lại (Refresh) trang web!");
             }
