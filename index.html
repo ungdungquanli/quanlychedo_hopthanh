@@ -174,8 +174,10 @@
     <div class="control-box">
       <select id="s_comboLoai" class="form-input" onchange="initSearchTable()"><option value="LUONG">Lương</option><option value="THAMNIEN">Thâm niên</option></select>
       <input type="text" id="s_hoten" class="form-input" placeholder="Tên cán bộ..." autocomplete="off" spellcheck="false" style="width: 160px;" />
-      <input type="text" id="s_thang" class="form-input" placeholder="Tháng (1, 12)" autocomplete="off" spellcheck="false" style="width: 80px;" />
-      <input type="text" id="s_nam" class="form-input" placeholder="Năm (2024)" autocomplete="off" spellcheck="false" style="width: 80px;" />
+      
+      <input type="text" id="s_thang" class="form-input" placeholder="Tháng (1-12)" autocomplete="off" spellcheck="false" style="width: 80px;" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value > 12) this.value = 12;" maxlength="2" />
+      <input type="text" id="s_nam" class="form-input" placeholder="Năm (2024)" autocomplete="off" spellcheck="false" style="width: 80px;" oninput="this.value = this.value.replace(/[^0-9]/g, '');" maxlength="4" />
+      
       <button class="btn btn-primary" onclick="doSearch()">🔍 Tra cứu</button>
     </div>
     <div class="table-responsive"><table><thead id="s_thead"></thead><tbody id="s_tbody"></tbody></table></div>
@@ -347,10 +349,23 @@
     thead.innerHTML = h; document.getElementById('s_tbody').innerHTML = '<tr><td colspan="15" style="color:#666; padding:15px;">...</td></tr>';
   }
 
+  // KHỐI SỬA LỖI TRA CỨU: Chuẩn hóa dữ liệu đầu vào, chống timeout do lọc tràn lan
   function doSearch() {
     const loai = document.getElementById('s_comboLoai').value;
-    const boLoc = { text8: document.getElementById('s_hoten').value, text2: document.getElementById('s_thang').value, text3: document.getElementById('s_nam').value };
-    const tbody = document.getElementById('s_tbody'); tbody.innerHTML = '<tr><td colspan="15">⏳ Đang tải...</td></tr>';
+    const rawHoTen = document.getElementById('s_hoten').value.trim();
+    let rawThang = document.getElementById('s_thang').value.trim();
+    const rawNam = document.getElementById('s_nam').value.trim();
+
+    // Chuẩn hóa Tháng: Nếu nhập số có 1 chữ số (1 đến 9), tự động thêm số "0" phía trước.
+    // Điều này giúp máy chủ quét khớp chính xác định dạng ngày tháng (VD: "/01/"), tránh quét nhầm "1" thành "10", "11", "12".
+    if (rawThang.length === 1 && rawThang >= '1' && rawThang <= '9') {
+        rawThang = '0' + rawThang;
+    }
+
+    const boLoc = { text8: rawHoTen, text2: rawThang, text3: rawNam };
+    
+    const tbody = document.getElementById('s_tbody'); 
+    tbody.innerHTML = '<tr><td colspan="15">⏳ Đang tải...</td></tr>';
     
     window.google.script.run.withSuccessHandler(rows => {
       if(!rows || rows.length === 0) { tbody.innerHTML = '<tr><td colspan="15">Không có dữ liệu phù hợp.</td></tr>'; return; }
