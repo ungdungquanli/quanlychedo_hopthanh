@@ -348,20 +348,19 @@
   }
 
   // ====================================================================================
-  // KHỐI HÀM doSearch ĐÃ ĐƯỢC NÂNG CẤP BỘ LỌC CHÍNH XÁC KÉP TRÊN TRÌNH DUYỆT (FRONT-END)
+  // KHỐI HÀM doSearch: Đã loại bỏ hoàn toàn sự can thiệp của bộ lọc phía Server 
+  // bằng cách truyền text2 và text3 là rỗng. Trình duyệt sẽ đảm nhận 100% việc lọc chính xác.
   // ====================================================================================
   function doSearch() {
     const loai = document.getElementById('s_comboLoai').value;
     const rawHoTen = document.getElementById('s_hoten').value.trim();
-    let rawThang = document.getElementById('s_thang').value.trim();
+    const rawThang = document.getElementById('s_thang').value.trim();
     const rawNam = document.getElementById('s_nam').value.trim();
 
-    // Định dạng đồng nhất trước khi gửi về máy chủ
-    if (rawThang.length === 1 && rawThang >= '1' && rawThang <= '9') {
-        rawThang = '0' + rawThang;
-    }
-
-    const boLoc = { text8: rawHoTen, text2: rawThang, text3: rawNam };
+    // Để tránh lỗi kiểu dữ liệu (String vs Number) trên Server khiến dữ liệu bị hụt, 
+    // ta bỏ trống text2 và text3 khi gửi về Server. 
+    // Server sẽ gửi toàn bộ dữ liệu, và Trình duyệt sẽ tự lọc toán học để đảm bảo độ chính xác 100%.
+    const boLoc = { text8: rawHoTen, text2: "", text3: "" };
     
     const tbody = document.getElementById('s_tbody'); 
     tbody.innerHTML = '<tr><td colspan="15">⏳ Đang tải...</td></tr>';
@@ -369,7 +368,7 @@
     window.google.script.run.withSuccessHandler(rows => {
       if(!rows || rows.length === 0) { tbody.innerHTML = '<tr><td colspan="15">Không có dữ liệu phù hợp.</td></tr>'; return; }
 
-      // BỘ LỌC THỨ CẤP: Chặn đứng sai sót từ server, so sánh toán học chính xác 100%
+      // BỘ LỌC THỨ CẤP: Ép kiểu Số nguyên (Number) để đối chiếu tuyệt đối (===)
       if (rawThang !== "" || rawNam !== "") {
           const searchM = rawThang !== "" ? parseInt(rawThang, 10) : null;
           const searchY = rawNam !== "" ? parseInt(rawNam, 10) : null;
@@ -377,8 +376,8 @@
           rows = rows.filter(r => {
               let m1, y1, m2, y2;
               if (loai === 'LUONG') {
-                  m1 = parseInt(r[6], 10); y1 = parseInt(r[7], 10); // Ngày hưởng (tháng/năm)
-                  m2 = parseInt(r[12], 10); y2 = parseInt(r[13], 10); // Ngày nâng (tháng/năm)
+                  m1 = parseInt(r[6], 10); y1 = parseInt(r[7], 10);
+                  m2 = parseInt(r[12], 10); y2 = parseInt(r[13], 10);
               } else {
                   m1 = parseInt(r[4], 10); y1 = parseInt(r[5], 10);
                   m2 = parseInt(r[9], 10); y2 = parseInt(r[10], 10);
@@ -387,15 +386,23 @@
               let match1 = true;
               let match2 = true;
               
-              // So khớp tuyệt đối với mốc thời gian 1 (Ngày Hưởng)
-              if (searchM !== null && m1 !== searchM) match1 = false;
-              if (searchY !== null && y1 !== searchY) match1 = false;
+              // Kiểm tra đối chiếu với Mốc 1 (Ngày Hưởng)
+              if (searchM !== null) {
+                  if (isNaN(m1) || m1 !== searchM) match1 = false;
+              }
+              if (searchY !== null) {
+                  if (isNaN(y1) || y1 !== searchY) match1 = false;
+              }
               
-              // So khớp tuyệt đối với mốc thời gian 2 (Ngày Nâng)
-              if (searchM !== null && m2 !== searchM) match2 = false;
-              if (searchY !== null && y2 !== searchY) match2 = false;
+              // Kiểm tra đối chiếu với Mốc 2 (Ngày Nâng)
+              if (searchM !== null) {
+                  if (isNaN(m2) || m2 !== searchM) match2 = false;
+              }
+              if (searchY !== null) {
+                  if (isNaN(y2) || y2 !== searchY) match2 = false;
+              }
               
-              // Trả về hợp lệ nếu khớp chính xác với Mốc 1 HOẶC Mốc 2
+              // Giữ lại dòng dữ liệu nếu nó khớp trọn vẹn với Mốc 1 HOẶC Mốc 2
               return match1 || match2;
           });
       }
