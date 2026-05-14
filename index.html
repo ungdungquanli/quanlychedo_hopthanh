@@ -16,7 +16,7 @@
 
   <script>
     /* ==========================================================================
-       INTERNAL API BRIDGE (DI CHUYỂN TỪ KETNOI.JS)
+       INTERNAL API BRIDGE (ĐÃ VÁ LỖI BẮT CATCH)
        ========================================================================== */
     window.google = window.google || {};
     window.google.script = window.google.script || {};
@@ -188,10 +188,11 @@
    <div class="loading-text" id="loading-msg">Đang tải cấu hình...</div>
 </div>
 
-<div id="notify_modal" class="overlay-screen" style="display:none;">
-   <div class="msg-box">
-      <span id="notify_icon" class="msg-icon">⚠️</span><h2 id="notify_title" class="msg-title">Thông báo</h2>
-      <div id="notify_desc" class="msg-desc">Nội dung...</div>
+<div id="notify_modal" class="overlay-screen" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100000; align-items: center; justify-content: center;">
+   <div class="msg-box" style="background: white; padding: 25px; border-radius: 8px; text-align: center; min-width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+      <div id="notify_icon" class="msg-icon" style="font-size: 30px; margin-bottom: 10px;">⚠️</div>
+      <h3 id="notify_title" class="msg-title" style="margin-top: 0;">Thông báo</h3>
+      <div id="notify_desc" class="msg-desc" style="margin-bottom: 20px; font-size: 15px;">Nội dung...</div>
       <button class="btn btn-primary" onclick="closeNotify()" style="width:100px; justify-content: center; margin: 0 auto; display: flex;">Đóng</button>
    </div>
 </div>
@@ -233,7 +234,7 @@
       <div>
         <button id="btn_addRow" class="btn btn-success" onclick="addRow()">+ Thêm dòng</button>
         <button class="btn btn-primary" onclick="saveAll()">💾 Lưu tất cả</button>
-        <span id="updateStatus" class="status-msg"></span>
+        <span id="updateStatus" class="status-msg" style="margin-left: 10px; font-weight: bold;"></span>
       </div>
     </div>
     <div class="table-responsive">
@@ -288,6 +289,7 @@
       else if (type === 'error') { icon.innerText = '❌'; title.innerText = 'Lỗi'; title.style.color = 'var(--red)'; } 
       else { icon.innerText = '⚠️'; title.innerText = 'Lưu ý'; title.style.color = 'var(--orange)'; }
   }
+  
   function closeNotify() { document.getElementById('notify_modal').style.display = 'none'; }
   
   const CONFIG = {
@@ -330,35 +332,35 @@
 
   function addRow() {
     const type = document.getElementById('u_comboLoai').value; const cols = CONFIG[type]; const tbody = document.getElementById('u_tbody');
-    const tr = document.createElement('tr'); tr.className = 'data-row'; let html = '<td class="stt-cell"></td>';
+    const tr = document.createElement('tr'); tr.className = 'data-row'; let html = '<td class="stt-cell" style="font-weight:bold; color:var(--primary);"></td>';
     cols.forEach(c => {
-      if (c.type === 'del') html += `<td><button class="btn btn-danger" onclick="removeRow(this)" style="padding:2px 8px;">×</button></td>`;
+      if (c.type === 'del') html += `<td><button class="btn btn-danger" onclick="removeRow(this)" style="padding:2px 8px;">✕</button></td>`;
       else if (c.type === 'qd') {
-        html += `<td><div style="display:flex; flex-direction:column; gap:4px; align-items:center; justify-content:center;"><div style="display:flex; gap:4px; align-items:center;"><span class="mini-btn mini-up-btn" onclick="triggerUpload(this)" title="Đính kèm Quyết định" style="padding: 4px 10px;">📁 Đính kèm</span><span class="mini-btn mini-del-btn" onclick="deleteFileInRow(this)" title="Xóa file" style="padding: 4px 10px;">❌ Xóa</span><input type="hidden" data-key="${c.id}"><input type="hidden" data-key="${c.id}Link"><input type="hidden" data-key="${c.id}Text"></div><div class="dynamic-links" style="display:flex; flex-wrap:wrap; gap:3px; justify-content:center;"></div></div></td>`;
-      } else if (c.type === 'date') html += `<td><input type="text" autocomplete="off" class="cell-input" data-key="${c.id}" placeholder="dd/mm/yyyy" maxlength="10" oninput="autoFormatDate(this)" style="width:${c.w||'100%'}"></td>`;
-      else html += `<td><input type="text" autocomplete="off" class="cell-input ${c.align||'center'}" data-key="${c.id}" style="width:${c.w||'100%'}" placeholder="..."></td>`;
+        html += `<td><div style="display:flex; flex-direction:column; gap:4px; align-items:center; justify-content:center;"><div style="display:flex; gap:4px; align-items:center;"><span class="mini-btn mini-up-btn btn btn-sm btn-outline-primary" onclick="triggerUpload(this)" title="Đính kèm Quyết định" style="padding: 4px 10px; font-weight:bold; cursor:pointer;">📁 Đính kèm</span><span class="mini-btn mini-del-btn btn btn-sm btn-outline-danger" onclick="deleteFileInRow(this)" title="Xóa file" style="padding: 4px 10px; font-weight:bold; cursor:pointer; display:none;">❌ Xóa</span><input type="hidden" data-key="${c.id}"><input type="hidden" data-key="${c.id}Link"><input type="hidden" data-key="${c.id}Text"></div><div class="dynamic-links" style="display:flex; flex-wrap:wrap; gap:3px; justify-content:center;"></div></div></td>`;
+      } else if (c.type === 'date') html += `<td><input type="text" autocomplete="off" class="cell-input text-center" data-key="${c.id}" placeholder="dd/mm/yyyy" maxlength="10" oninput="autoFormatDate(this)" style="width:${c.w||'100%'}"></td>`;
+      else html += `<td><input type="text" autocomplete="off" class="cell-input ${c.align==='left' ? 'text-start' : 'text-center'}" data-key="${c.id}" style="width:${c.w||'100%'}" placeholder="..."></td>`;
     });
     tr.innerHTML = html; tbody.appendChild(tr); updateSTT();
   }
 
-  function removeRow(btn) { if (document.getElementById('u_tbody').rows.length > 1) { btn.closest('tr').remove(); updateSTT(); } else showNotify("Cần giữ lại ít nhất 1 dòng."); }
+  function removeRow(btn) { if (document.getElementById('u_tbody').rows.length > 1) { btn.closest('tr').remove(); updateSTT(); } else showNotify("Cần giữ lại ít nhất 1 dòng.", "warning"); }
   function updateSTT() { document.querySelectorAll('.stt-cell').forEach((td, i) => td.innerText = i + 1); }
 
   function initSearchTable() {
     const loai = document.getElementById('s_comboLoai').value; const thead = document.getElementById('s_thead'); let h = '<tr>';
-    if (window.CD_CAN_EDIT) h += '<th>Sửa</th>'; h += '<th>STT</th>';
-    if (loai === 'LUONG') h += `<th class="text-left">Họ tên</th><th>Mã</th><th>Bậc</th><th>Hệ số</th><th>Ngày Hưởng</th><th>Bậc Nâng</th><th>HS Nâng</th><th>Ngày Nâng</th><th>Số Quyết định</th><th>Ngày CT</th></tr>`;
-    else h += `<th class="text-left">Họ tên</th><th>TL% hiện hưởng</th><th>Ngày Hưởng</th><th>TL% Nâng</th><th>Ngày Nâng</th><th>Số Quyết định</th></tr>`;
-    thead.innerHTML = h; document.getElementById('s_tbody').innerHTML = '<tr><td colspan="15" style="color:#666; padding:15px;">...</td></tr>';
+    if (window.CD_CAN_EDIT) h += '<th style="width:40px;">Sửa</th>'; h += '<th style="width:40px;">STT</th>';
+    if (loai === 'LUONG') h += `<th class="text-left" style="width:160px;">Họ và tên</th><th>Mã ngạch</th><th>Bậc</th><th>Hệ số</th><th class="th-hk1">Ngày hưởng</th><th>Bậc Nâng</th><th>HS Nâng</th><th class="th-hk1">Ngày Nâng</th><th>Số Quyết định</th><th>Ngày CT</th></tr>`;
+    else h += `<th class="text-left" style="width:160px;">Họ và tên</th><th style="color:#b91c1c;">TL% hiện hưởng</th><th class="th-hk1">Ngày hưởng</th><th style="color:#059669;">TL% Nâng</th><th class="th-hk1">Ngày Nâng</th><th>Số Quyết định</th></tr>`;
+    thead.innerHTML = h; document.getElementById('s_tbody').innerHTML = '<tr><td colspan="15" style="color:#666; padding:15px; font-style:italic;">Nhấn Tra cứu để xem dữ liệu...</td></tr>';
   }
 
   function doSearch() {
     const loai = document.getElementById('s_comboLoai').value; const rawHoTen = document.getElementById('s_hoten').value.trim();
     const rawThang = document.getElementById('s_thang').value.trim(); const rawNam = document.getElementById('s_nam').value.trim();
-    const tbody = document.getElementById('s_tbody'); tbody.innerHTML = '<tr><td colspan="15">⏳ Đang tải...</td></tr>';
+    const tbody = document.getElementById('s_tbody'); tbody.innerHTML = '<tr><td colspan="15" style="color:#0d6efd; font-weight:bold;">⏳ Đang tải dữ liệu...</td></tr>';
     
     window.google.script.run.withSuccessHandler(rows => {
-      if(!rows || rows.length === 0) { tbody.innerHTML = '<tr><td colspan="15">Không có dữ liệu phù hợp.</td></tr>'; return; }
+      if(!rows || rows.length === 0) { tbody.innerHTML = '<tr><td colspan="15" style="color:#dc3545; font-weight:bold;">Không có dữ liệu phù hợp.</td></tr>'; return; }
       if (rawThang !== "" || rawNam !== "") {
           const sM = rawThang !== "" ? parseInt(rawThang, 10) : null; const sY = rawNam !== "" ? parseInt(rawNam, 10) : null;
           rows = rows.filter(r => {
@@ -366,27 +368,29 @@
               let match = true; if (sM !== null && (isNaN(m2) || m2 !== sM)) match = false; if (sY !== null && (isNaN(y2) || y2 !== sY)) match = false; return match;
           });
       }
-      if(!rows || rows.length === 0) { tbody.innerHTML = '<tr><td colspan="15">Không có dữ liệu phù hợp.</td></tr>'; return; }
+      if(!rows || rows.length === 0) { tbody.innerHTML = '<tr><td colspan="15" style="color:#dc3545; font-weight:bold;">Không có dữ liệu phù hợp.</td></tr>'; return; }
       let h = '';
       rows.forEach((r, i) => {
         const qdObj = loai === 'LUONG' ? r[14] : r[11]; let linkDisplay = ""; let qdText = "";
         if (typeof qdObj === 'object' && qdObj !== null) {
             qdText = String(qdObj.text || "").trim(); let linkStr = String(qdObj.link || "").trim(); 
-            if (linkStr && linkStr.includes(',')) linkDisplay = `<div style="display:flex; flex-wrap:wrap; gap:3px; justify-content:center;">` + linkStr.split(',').map((l, idx) => `<a href="${l.trim()}" target="_blank" style="text-decoration:none; background:#e0f2fe; border:1px solid #bae6fd; padding:2px 5px; border-radius:3px; font-size:12px; font-weight:bold; color:#0369a1;">QĐ${idx+1}</a>`).join('') + `</div>`;
-            else if (linkStr) linkDisplay = `<a href="${linkStr}" target="_blank" style="text-decoration:none; background:#e0f2fe; border:1px solid #bae6fd; padding:2px 5px; border-radius:3px; font-size:12px; font-weight:bold; color:#0369a1;">QĐ 1</a>`;
+            if (linkStr && linkStr.includes(',')) linkDisplay = `<div style="display:flex; flex-wrap:wrap; gap:3px; justify-content:center;">` + linkStr.split(',').map((l, idx) => `<a href="${l.trim()}" target="_blank" style="text-decoration:none; background:#e0f2fe; border:1px solid #bae6fd; padding:2px 6px; border-radius:4px; font-size:12px; font-weight:bold; color:#0369a1; box-shadow:0 1px 2px rgba(0,0,0,0.1);">QĐ${idx+1}</a>`).join('') + `</div>`;
+            else if (linkStr) linkDisplay = `<a href="${linkStr}" target="_blank" style="text-decoration:none; background:#e0f2fe; border:1px solid #bae6fd; padding:2px 6px; border-radius:4px; font-size:12px; font-weight:bold; color:#0369a1; box-shadow:0 1px 2px rgba(0,0,0,0.1);">QĐ 1</a>`;
             else linkDisplay = qdText;
         } else {
             let str = String(qdObj || "").trim();
-            if(str.includes('http')) linkDisplay = `<div style="display:flex; flex-wrap:wrap; gap:3px; justify-content:center;">` + str.split(',').filter(l => l.includes('http')).map((l, idx) => `<a href="${l.trim()}" target="_blank" style="text-decoration:none; background:#e0f2fe; border:1px solid #bae6fd; padding:2px 5px; border-radius:3px; font-size:12px; font-weight:bold; color:#0369a1;">QĐ${idx+1}</a>`).join('') + `</div>`;
+            if(str.includes('http')) linkDisplay = `<div style="display:flex; flex-wrap:wrap; gap:3px; justify-content:center;">` + str.split(',').filter(l => l.includes('http')).map((l, idx) => `<a href="${l.trim()}" target="_blank" style="text-decoration:none; background:#e0f2fe; border:1px solid #bae6fd; padding:2px 6px; border-radius:4px; font-size:12px; font-weight:bold; color:#0369a1; box-shadow:0 1px 2px rgba(0,0,0,0.1);">QĐ${idx+1}</a>`).join('') + `</div>`;
             else linkDisplay = str;
         }
-        let htmlSua = window.CD_CAN_EDIT ? `<td><button onclick="transferToEdit('${encodeURIComponent(JSON.stringify(r))}', '${loai}')" style="border:1px solid #94a3b8; background:#fff; cursor:pointer; padding:3px 8px; border-radius:4px; color:#1e3a8a; font-weight:bold;">📝</button></td>` : "";
-        h += `<tr>${htmlSua}<td>${i+1}</td>`;
-        if (loai === 'LUONG') h += `<td class="text-left"><b>${r[1]}</b></td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${formatD(r[5],r[6],r[7])}</td><td>${r[9]}</td><td>${r[10]}</td><td>${formatD(r[11],r[12],r[13])}</td><td>${linkDisplay}</td><td>${r[15] ? formatvnDate(r[15]) : ""}</td></tr>`;
-        else h += `<td class="text-left"><b>${r[1]}</b></td><td style="color:#b91c1c; font-weight:bold;">${formatPercent(r[2])}</td><td>${formatD(r[3],r[4],r[5])}</td><td style="color:#059669; font-weight:bold;">${formatPercent(r[7])}</td><td>${formatD(r[8],r[9],r[10])}</td><td>${linkDisplay}</td></tr>`;
+        let htmlSua = window.CD_CAN_EDIT ? `<td><button onclick="transferToEdit('${encodeURIComponent(JSON.stringify(r))}', '${loai}')" style="border:1px solid #94a3b8; background:#fff; cursor:pointer; padding:4px 8px; border-radius:4px; color:#1e3a8a; font-weight:bold;" title="Sửa dữ liệu">📝</button></td>` : "";
+        h += `<tr>${htmlSua}<td style="font-weight:bold; color:var(--primary);">${i+1}</td>`;
+        if (loai === 'LUONG') h += `<td class="text-start" style="font-weight:bold; color:#1f2937;">${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td style="background:#f0f9ff;">${formatD(r[5],r[6],r[7])}</td><td>${r[9]}</td><td>${r[10]}</td><td style="background:#f0f9ff;">${formatD(r[11],r[12],r[13])}</td><td>${linkDisplay}</td><td>${r[15] ? formatvnDate(r[15]) : ""}</td></tr>`;
+        else h += `<td class="text-start" style="font-weight:bold; color:#1f2937;">${r[1]}</td><td style="color:#b91c1c; font-weight:bold;">${formatPercent(r[2])}</td><td style="background:#f0f9ff;">${formatD(r[3],r[4],r[5])}</td><td style="color:#059669; font-weight:bold;">${formatPercent(r[7])}</td><td style="background:#f0f9ff;">${formatD(r[8],r[9],r[10])}</td><td>${linkDisplay}</td></tr>`;
       });
       tbody.innerHTML = h;
-    }).withFailureHandler(loi => { tbody.innerHTML=`<tr><td colspan="15">Lỗi: ${loi.message}</td></tr>`; })[loai === 'LUONG' ? 'CD_TraCuuLuong' : 'CD_TraCuuThamNien']({ text8: rawHoTen, text2: "", text3: "" }); 
+    }).withFailureHandler(loi => { 
+        tbody.innerHTML=`<tr><td colspan="15" style="color:#dc3545; font-weight:bold;">Lỗi: ${loi.message}</td></tr>`; 
+    })[loai === 'LUONG' ? 'CD_TraCuuLuong' : 'CD_TraCuuThamNien']({ text8: rawHoTen, text2: "", text3: "" }); 
   }
 
   function transferToEdit(dataEncoded, loai) {
@@ -417,12 +421,12 @@
     for (let i = 0; i < rows.length; i++) {
         const tr = rows[i]; const inputs = tr.querySelectorAll('input'); const rowData = { loai: type }; let hasData = false;
         inputs.forEach(inp => { const k = inp.getAttribute('data-key'); if (k) { rowData[k] = inp.value.trim() || (editRowIndex ? " " : ""); if (rowData[k].trim() !== "" && k !== 'soqdLink' && k !== 'soqdText') hasData = true; } });
-        if (hasData && (!rowData.hoten || rowData.hoten.trim() === "")) { showNotify("⚠️ Dòng " + (i + 1) + ": Thiếu HỌ VÀ TÊN!"); return; }
+        if (hasData && (!rowData.hoten || rowData.hoten.trim() === "")) { showNotify("⚠️ Dòng " + (i + 1) + ": Thiếu HỌ VÀ TÊN!", "warning"); return; }
         if (hasData) dataList.push(rowData);
     }
-    if (dataList.length === 0) return; status.className = 'status-msg text-loading'; status.innerText = `⏳ Đang lưu...`;
-    const finish = (res) => { status.className = 'status-msg text-success'; status.innerText = "✅ " + res; showNotify("✅ " + res, "success"); if(editRowIndex) switchTab('search'); renderInputTableStructure(); };
-    const fail = (e) => { status.className = 'status-msg text-error'; status.innerText = "❌ " + e.message; showNotify("❌ " + e.message, "error"); };
+    if (dataList.length === 0) return; status.style.color = '#d97706'; status.innerText = `⏳ Đang lưu...`;
+    const finish = (res) => { status.style.color = '#059669'; status.innerText = "✅ " + res; showNotify("✅ " + res, "success"); if(editRowIndex) switchTab('search'); renderInputTableStructure(); };
+    const fail = (e) => { status.style.color = '#dc2626'; status.innerText = "❌ Lỗi: " + e.message; showNotify("❌ " + e.message, "error"); };
     if (editRowIndex) window.google.script.run.withSuccessHandler(finish).withFailureHandler(fail).CD_CapNhatMotDong(type, editRowIndex, dataList[0]);
     else window.google.script.run.withSuccessHandler(finish).withFailureHandler(fail).CD_CapNhatHangLoat(dataList);
   }
@@ -434,7 +438,7 @@
   function renderDynamicLinks(cell) {
       const linkInput = cell.querySelector('input[data-key="soqdLink"]'); const container = cell.querySelector('.dynamic-links');
       if(!container || !linkInput) return; container.innerHTML = ''; const urls = linkInput.value.split(',').map(u => u.trim()).filter(u => u);
-      if(urls.length > 0) container.innerHTML = urls.map((u, idx) => `<a href="${u}" target="_blank" style="text-decoration:none; background:#e0f2fe; border:1px solid #bae6fd; padding:2px 5px; border-radius:3px; font-size:12px; font-weight:bold; color:#0369a1;">QĐ${idx+1}</a>`).join('');
+      if(urls.length > 0) container.innerHTML = urls.map((u, idx) => `<a href="${u}" target="_blank" style="text-decoration:none; background:#e0f2fe; border:1px solid #bae6fd; padding:2px 5px; border-radius:3px; font-size:12px; font-weight:bold; color:#0369a1; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">QĐ${idx+1}</a>`).join('');
   }
 
   function triggerUpload(btn) {
@@ -453,27 +457,46 @@
       if(!confirm("Xóa file trên Drive?")) return; const rowCell = btn.closest('td'); 
       const linkInput = rowCell.querySelector('input[data-key="soqdLink"]'); const url = linkInput ? linkInput.value : "";
       if(!url) { resetRowFileUI(rowCell); return; } btn.innerText = "⏳";
-      window.google.script.run.withSuccessHandler(res => { if(res.thanhCong) { resetRowFileUI(rowCell); showNotify("Đã xóa file!", "success"); } }).CD_XoaMinhChung(url);
+      window.google.script.run.withSuccessHandler(res => { if(res.success) { resetRowFileUI(rowCell); showNotify("Đã xóa file!", "success"); } else { showNotify("Lỗi xóa file!", "error"); btn.innerText = "❌ Xóa"; } }).withFailureHandler(err => { showNotify("Lỗi máy chủ", "error"); btn.innerText = "❌ Xóa"; }).CD_XoaMinhChung(url);
   }
 
   function resetRowFileUI(cell) {
       const linkI = cell.querySelector('input[data-key="soqdLink"]'); const textI = cell.querySelector('input[data-key="soqd"]');
       const upB = cell.querySelector('.mini-up-btn'); const delB = cell.querySelector('.mini-del-btn');
-      if(linkI) linkI.value = ""; if(textI) textI.value = ""; if(upB) { upB.innerText = "📁 Đính kèm"; upB.style.color = "#0284c7"; } if(delB) delB.style.display = "none"; cell.querySelector('.dynamic-links').innerHTML = '';
+      if(linkI) linkI.value = ""; if(textI) textI.value = ""; if(upB) { upB.innerText = "📁 Đính kèm"; upB.style.color = "var(--primary)"; } if(delB) delB.style.display = "none"; cell.querySelector('.dynamic-links').innerHTML = '';
   }
 
   function startAppMain() {
       const tk = sessionStorage.getItem("CD_TAI_KHOAN");
       if (!tk) { document.getElementById('login-overlay').style.display = 'flex'; document.getElementById('pageLoading').style.display = 'none'; } 
       else {
-        document.getElementById('pageLoading').style.display = 'flex'; document.getElementById('loading-msg').innerText = "Đang kiểm tra phân quyền...";
-        window.google.script.run.withSuccessHandler(ctx => {
-          document.getElementById('pageLoading').style.display = 'none';
-          if (!ctx.quyenXem && !ctx.quyenSua) { document.getElementById('accessDenied').style.display = 'flex'; document.getElementById('deniedEmailTxt').innerText = ctx.taiKhoan; return; }
-          if (!ctx.quyenSua) { document.getElementById('btnTabUpdate')?.remove(); document.getElementById('tab-update')?.remove(); }
-          window.CD_CAN_EDIT = ctx.quyenSua; initSearchTable(); document.getElementById('mainApp').style.opacity = '1';
-          if (ctx.quyenSua) window.google.script.run.CD_KiemTraQuyenDrive();
-        }).CD_LayQuyenNguoiDung(tk);
+        document.getElementById('pageLoading').style.display = 'flex'; 
+        document.getElementById('loading-msg').innerText = "Đang kiểm tra phân quyền...";
+        
+        window.google.script.run
+        .withSuccessHandler(ctx => {
+            document.getElementById('pageLoading').style.display = 'none';
+            if (!ctx.quyenXem && !ctx.quyenSua) { 
+                document.getElementById('accessDenied').style.display = 'flex'; 
+                document.getElementById('deniedEmailTxt').innerText = ctx.taiKhoan; 
+                return; 
+            }
+            if (!ctx.quyenSua) { 
+                document.getElementById('btnTabUpdate')?.remove(); 
+                document.getElementById('tab-update')?.remove(); 
+            }
+            window.CD_CAN_EDIT = ctx.quyenSua; 
+            initSearchTable(); 
+            document.getElementById('mainApp').style.opacity = '1';
+            
+            if (ctx.quyenSua) window.google.script.run.CD_KiemTraQuyenDrive();
+        })
+        .withFailureHandler(err => {
+            document.getElementById('pageLoading').style.display = 'none';
+            showNotify("Lỗi máy chủ API: " + err.message, "error");
+            document.getElementById('login-overlay').style.display = 'flex';
+        })
+        .CD_LayQuyenNguoiDung(tk);
       }
   }
 </script>
