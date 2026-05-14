@@ -5,7 +5,7 @@
  */
 
 // ĐỊA CHỈ API WEB APP (ĐUÔI /EXEC)
-const HT_DUONG_DAN_API = "https://script.google.com/macros/s/AKfycbxeVlyhO7O7mGq_xKkX5_m6fR5yE0_K6S.../exec"; 
+const HT_DUONG_DAN_API = "https://script.google.com/macros/s/AKfycbzOVyDWdKsn0mG0ba38cpimEaQjkLNG-XlK_pOZ_pvW5gmw1-O9IlErQrJVvSn2bZLi/exec"; 
 
 // THÔNG SỐ ĐỊNH DANH HỆ THỐNG
 var CD_LINK_LOGO = "https://i.ibb.co/XkjLVJFt/logo-TH-THCS-v3.png";
